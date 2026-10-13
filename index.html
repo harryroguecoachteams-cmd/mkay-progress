@@ -81,7 +81,8 @@ tr.det{display:none}tr.det.open{display:table-row}
 .foot{color:var(--muted);font-size:13px}
 .foot dt{font-weight:700;color:var(--ink2);margin-top:8px}.foot dd{margin:0}
 .tablewrap{overflow-x:auto}
-@media (max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}.det-grid{grid-template-columns:1fr}.hide-sm{display:none}th,td{padding:10px 5px;font-size:14px}}
+td:first-child{white-space:nowrap}
+@media (max-width:760px){.seg{display:grid;grid-template-columns:1fr 1fr;border-radius:14px;width:100%}.seg button{border-radius:10px}.chart text{font-size:15px}.kpis{grid-template-columns:repeat(2,1fr)}.det-grid{grid-template-columns:1fr}.hide-sm{display:none}th,td{padding:10px 5px;font-size:14px}}
 </style>
 </head>
 <body>
@@ -190,7 +191,7 @@ function render(d){
 }
 
 function chart(){
-  const M = D.months, W = 900, H = 300, L = 8, R = 8, T = 24, B = 34;
+  const M = D.months, sm = $('#chart').clientWidth < 600, W = sm ? 420 : 900, H = sm ? 320 : 300, L = 8, R = 8, T = 24, B = 34;
   const vals = M.map(m => val(m,K)), paces = M.map(m => pace(m,K));
   const max = Math.max(...vals, ...paces.filter(p => p!==null), 1) * 1.08;
   const step = (W-L-R)/M.length, bw = Math.min(54, step*0.62);
@@ -202,9 +203,9 @@ function chart(){
     const cx = L + step*i + step/2, x = cx - bw/2, v = vals[i], p = paces[i];
     if (p !== null && p > v) s += `<path d="${bar(x, y(p), bw, H-B-y(p))}" fill="var(--bar2)" opacity=".75"/>`;
     s += `<path d="${bar(x, y(v), bw, H-B-y(v))}" fill="var(--bar)"/>`;
-    const showLab = v > 0 && (i === M.length-1 || i === M.length-2 || v === Math.max(...vals));
-    if (showLab) s += `<text class="val" x="${cx}" y="${y(Math.max(v, p||0))-7}" text-anchor="middle">${fmt(v)}</text>`;
-    s += `<text x="${cx}" y="${H-B+20}" text-anchor="middle">${lab(m)}${m.partial?'*':''}</text>`;
+    const showLab = v > 0 && (i === M.length-1 || i === M.length-2 || v === Math.max(...vals)) && !(sm && i === M.length-2 && v !== Math.max(...vals));
+    if (showLab) s += `<text class="val" x="${cx}" y="${y(Math.max(v, p||0))-7}" text-anchor="middle">${fmt(v)}${m.partial && p !== null ? ' so far' : ''}</text>`;
+    s += `<text x="${cx}" y="${H-B+20}" text-anchor="middle">${sm ? MN[+m.m.slice(5)-1][0] : lab(m)}${m.partial?'*':''}</text>`;
     s += `<rect x="${L+step*i}" y="${T}" width="${step}" height="${H-T-B}" fill="transparent" data-i="${i}"/>`;
   });
   s += '</svg>';
@@ -223,12 +224,12 @@ function bar(x, y0, w, h){ if (h <= 0) return ''; const r = Math.min(4, h, w/2);
 
 function table(){
   const M = D.months.slice().reverse();
-  let h = `<thead><tr><th>Month</th><th>Visitors</th><th class="hide-sm">Seen on Google</th><th>Page 1 searches</th><th class="hide-sm">Avg position</th><th>Articles</th></tr></thead><tbody>`;
+  let h = `<thead><tr><th>Month</th><th>Visitors</th><th class="hide-sm">Seen on Google</th><th class="hide-sm">Page 1 searches</th><th class="hide-sm">Avg position</th><th>Articles</th></tr></thead><tbody>`;
   M.forEach((m,i) => {
     const prev = M[i+1]; const ch = prev && !m.partial ? pct(m.clicks, prev.clicks) : null;
-    h += `<tr class="row" data-i="${i}" tabindex="0"><td><b>${full(m)}</b>${m.partial?` <span class="so">so far</span>`:''}</td>
+    h += `<tr class="row" data-i="${i}" tabindex="0"><td><b>${MN[+m.m.slice(5)-1]} ${m.m.slice(0,4)}</b>${m.partial?` <span class="so">so far</span>`:''}</td>
       <td>${fmt(m.clicks)}${ch!==null && prev.clicks>=5 ? ` <span class="${ch>=0?'up':'down'}" style="font-size:12px">${ch>=0?'+':''}${ch}%</span>`:''}</td>
-      <td class="hide-sm">${fmt(m.views)}</td><td>${fmt(m.top10)}</td><td class="hide-sm">${m.pos ? m.pos.toFixed(1) : '-'}</td><td>${m.posts.length}</td></tr>
+      <td class="hide-sm">${fmt(m.views)}</td><td class="hide-sm">${fmt(m.top10)}</td><td class="hide-sm">${m.pos ? m.pos.toFixed(1) : '-'}</td><td>${m.posts.length}</td></tr>
       <tr class="det" id="det${i}"><td colspan="6"><div class="det-grid">
         <div><h3>Top searches</h3>${m.topq.length ? '<ol>' + m.topq.map(q => `<li>${esc(q[0])} <span class="so">${q[1]} visits, pos ${q[3]}</span></li>`).join('') + '</ol>' : '<span class="so">No data yet</span>'}</div>
         <div><h3>Top pages</h3>${m.topp.length ? '<ol>' + m.topp.map(p => `<li><a href="${esc(p[0])}" target="_blank" rel="noopener">${esc(decodeURI(p[0]).replace(/^https?:\/\/(www\.)?travelwithmkay\.co\.ke/,'') || '/')}</a> <span class="so">${p[1]} visits</span></li>`).join('') + '</ol>' : '<span class="so">No data yet</span>'}
