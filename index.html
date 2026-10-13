@@ -123,7 +123,7 @@ tr.det{display:none}tr.det.open{display:table-row}
     <div class="badge" id="upd"></div>
   </div>
   <nav class="toc" aria-label="Sections">
-    <a href="#short">In short</a><a href="#monthly">Month by month</a><a href="#ranks">Rankings</a><a href="#keywords">Keywords</a><a href="#pages">Pages</a><a href="#who">Who finds you</a><a href="#leads">Leads</a><a href="#detail">Every month</a>
+    <a href="#short">In short</a><a href="#monthly">Month by month</a><a href="#ranks">Rankings</a><a href="#keywords">Keywords</a><a href="#pages">Pages</a><a href="#who">Who finds you</a><a href="#leads">Organic leads</a><a href="#detail">Every month</a>
   </nav>
 
   <div class="hero" id="hero"></div>
@@ -197,8 +197,8 @@ tr.det{display:none}tr.det.open{display:table-row}
   </section>
 
   <div class="card" id="leads">
-    <h2>Leads</h2>
-    <div class="hint">Sign-ups and bookings, and which channel brought them. This part covers all channels, not only Google.</div>
+    <h2>Organic leads</h2>
+    <div class="hint">Organic leads only: free resource sign-ups and contact-us messages from your website forms.</div>
     <div class="kpis" id="leadkpis" style="margin-bottom:6px"></div>
     <div class="two">
       <div id="leadchannels"></div>
@@ -224,7 +224,7 @@ tr.det{display:none}tr.det.open{display:table-row}
       <dt>Almost on page 1</dt><dd>Searches where you sit at position 11 to 20. A small improvement to the page can move these onto page 1, where most clicks happen.</dd>
       <dt>This month</dt><dd>Google reports with a 2 to 3 day delay, so the current month is "so far". The pale bar shows where the month is heading at today's pace.</dd>
     </dl>
-    <p class="so">Sources: Google Search Console, the blog on travelwithmkay.co.ke, and your sign-up sheet (webinar registrations and bootcamp orders).</p>
+    <p class="so">Sources: Google Search Console, the blog on travelwithmkay.co.ke, and your Brevo email lists (free resource and contact us).</p>
   </div>
 </div>
 
@@ -302,7 +302,7 @@ function short(){
   const brand = M.reduce((s,m) => s + m.brand_v, 0);
   const mob = p28.devices.find(x => x[0]==='MOBILE'), allc = p28.devices.reduce((s,x) => s + x[1], 0);
   const ke = p28.countries.find(x => x[0]==='ken');
-  const L = D.leads, wl = L.events.reduce((s,e) => s + e.total, 0);
+  const L = D.leads, wf = Object.values(L.web||{}).reduce((s,v) => s + v.freebie, 0), wc = Object.values(L.web||{}).reduce((s,v) => s + v.contact, 0);
   const items = [
     `<b>Google traffic is growing.</b> ${fmt(c)} people came from Google in the last 28 days, ${pct(c,pc)>=0?'up':'down'} ${Math.abs(pct(c,pc))}% from the 28 days before (${fmt(pc)}). In March it was ${fmt(M.find(m=>m.m.endsWith('-03'))?.clicks||0)} a month; in ${mname(last.m)} it was ${fmt(last.clicks)}.`,
     `<b>You now show on page 1 for ${fmt(last.bands[0] + last.bands[1])} different searches</b> (${mname(last.m)}, searches seen at least 3 times), up from ${fmt((M.find(m=>m.m.endsWith('-06'))||last).bands.slice(0,2).reduce((a,b)=>a+b,0))} in June.`,
@@ -312,7 +312,7 @@ function short(){
     `<b>${fmt(p28.nnew)} new searches</b> started showing your site in the last 28 days that did not show it in the 28 days before.`,
     `<b>Almost nobody searches for your name on Google yet</b> (${fmt(brand)} views since March for "Mkay" or "Maria Kamau"). People find you through your guides, not your name. Podcasts, press and YouTube are what build name searches over time.`,
     mob && allc ? `<b>${Math.round(mob[1]/allc*100)}% of Google visitors read on a phone</b>, and ${ke ? Math.round(ke[1]/c*100) : 0}% are in Kenya.` : '',
-    `<b>Leads:</b> ${fmt(wl)} webinar sign-ups across your last 2 webinars, almost all from WhatsApp and email. None are recorded as coming from Google yet. See the Leads section.`
+    `<b>Organic leads:</b> ${fmt(wf + wc)} people reached out through your website forms since March (${fmt(wf)} free resource sign-ups, ${fmt(wc)} contact-us messages). The best months were July and September, the same months your Google visitors jumped.`
   ];
   $('#shortlist').innerHTML = items.filter(Boolean).map(s => `<li>${s}</li>`).join('');
 }
@@ -415,22 +415,21 @@ function who(){
 }
 
 function leads(){
-  const L = D.leads, wl = L.events.reduce((s,e) => s + e.total, 0), g = L.events.reduce((s,e) => s + e.google, 0), oc = L.orders.length, done = L.orders.filter(o => o.status === 'completed').length;
-  $('#leadkpis').innerHTML = `<div class="kpi"><div class="l">Webinar sign-ups</div><div class="v">${fmt(wl)}</div><div class="d">across ${L.events.length} webinars</div></div>
-    <div class="kpi"><div class="l">Bootcamp orders started</div><div class="v">${oc}</div><div class="d">${done} paid</div></div>
-    <div class="kpi"><div class="l">Leads from Google search</div><div class="v">${g}</div><div class="d">recorded so far</div></div>
-    <div class="kpi"><div class="l">Free checklist sign-ups</div><div class="v">-</div><div class="d">waiting on email list access</div></div>`;
-  const ch = {}; L.events.forEach(e => e.channels.forEach(([k,v]) => ch[k] = (ch[k]||0) + v));
-  const arr = Object.entries(ch).sort((a,b) => b[1]-a[1]), max = Math.max(...arr.map(x => x[1]), 1);
-  const nm = k => ({whatsapp:'WhatsApp', email:'Email', facebook:'Facebook', instagram:'Instagram', 'zoom page':'Zoom page', direct:'Direct link', google:'Google'}[k] || k);
-  $('#leadchannels').innerHTML = `<h3>Where webinar sign-ups came from</h3>` + arr.map(([k,v]) => `<div class="hbar"><span>${nm(k)}</span><span class="t"><i style="width:${Math.max(2, v/max*100)}%"></i></span><span class="n">${v}</span></div>`).join('') +
-    `<div class="hbar"><span>Google search</span><span class="t"><i style="width:0"></i></span><span class="n">${g}</span></div>` +
-    `<div class="so" style="margin-top:6px">${L.events.map(e => `${e.name}: ${e.total}`).join(' · ')}. The sign-up page for each webinar is the page that brought these leads.</div>`;
-  const lm = Object.entries(L.months);
-  $('#leadtbl').innerHTML = `<thead><tr><th>Month</th><th>Webinar</th><th>Bootcamp</th><th>From Google</th></tr></thead><tbody>` +
-    lm.reverse().map(([m,v]) => `<tr><td>${MF[+m.slice(5)-1]} ${m.slice(0,4)}</td><td>${v.webinar}</td><td>${v.orders}</td><td>${v.google}</td></tr>`).join('') + '</tbody>';
-  $('#leadnote').innerHTML = `<b>Why Google shows no leads yet.</b> Your Google visitors land on travel guides (weekend getaways, camping, Kenya visa). Those guides already have your free checklist sign-up form, but the form does not yet record where each person came from, and your webinar and bootcamp sign-ups come from WhatsApp and email links. So today we can see readers from Google, but not which of them became leads.<br><br>
-    <b>Which search terms bring leads?</b> Google never tells a website the exact words a person searched. The best anyone can do is tie a lead to the page it started on, and then use the keyword table above to see which searches send people to that page. Once checklist sign-ups record their starting page, this section will show "leads per page" and the searches behind each page.`;
+  const W = D.leads.web || {};
+  const fr = Object.values(W).reduce((s,v) => s + v.freebie, 0), ct = Object.values(W).reduce((s,v) => s + v.contact, 0);
+  const rows = D.months.map(m => ({m: m.m, partial: m.partial, g: m.clicks, f: (W[m.m]||{}).freebie || 0, c: (W[m.m]||{}).contact || 0}));
+  const done = rows.filter(r => !r.partial), last = done[done.length-1];
+  $('#leadkpis').innerHTML = `<div class="kpi"><div class="l">Organic leads since March</div><div class="v">${fr + ct}</div><div class="d">from your website forms</div></div>
+    <div class="kpi"><div class="l">Free resource sign-ups</div><div class="v">${fr}</div><div class="d">since March</div></div>
+    <div class="kpi"><div class="l">Contact-us messages</div><div class="v">${ct}</div><div class="d">since March</div></div>
+    <div class="kpi"><div class="l">Organic leads in ${mname(last.m)}</div><div class="v">${last.f + last.c}</div><div class="d">${last.g ? 'about 1 for every ' + Math.round(last.g / Math.max(1, last.f + last.c)) + ' Google visitors' : ''}</div></div>`;
+  const max = Math.max(...rows.map(r => r.f + r.c), 1);
+  $('#leadchannels').innerHTML = `<h3>Organic leads each month</h3>` + rows.map(r => `<div class="hbar"><span>${MN[+r.m.slice(5)-1]}${r.partial?' (so far)':''}</span><span class="t" style="display:flex"><i style="width:${r.f/max*100}%;border-radius:0"></i><i style="width:${r.c/max*100}%;background:var(--b2);border-radius:0 4px 4px 0"></i></span><span class="n">${r.f + r.c}</span></div>`).join('') +
+    `<div class="legend"><span><i style="background:var(--bar)"></i>Free resource</span><span><i style="background:var(--b2)"></i>Contact us</span></div>`;
+  $('#leadtbl').innerHTML = `<thead><tr><th>Month</th><th>Google visitors</th><th>Free resource</th><th>Contact us</th><th>Total</th></tr></thead><tbody>` +
+    rows.slice().reverse().map(r => `<tr><td>${MN[+r.m.slice(5)-1]} ${r.m.slice(0,4)}${r.partial?' <span class="so">so far</span>':''}</td><td>${fmt(r.g)}</td><td>${r.f}</td><td>${r.c}</td><td><b>${r.f + r.c}</b></td></tr>`).join('') + '</tbody>';
+  $('#leadnote').innerHTML = `<b>What counts here.</b> Only organic leads: people who filled in the free resource or contact-us form on your website. Webinar registrations and bootcamp orders are left out because they came from your WhatsApp and email links, not from Google. Organic leads grew in the same months your Google visitors grew (July and September). The forms do not record where each person came from, so a few may have reached your site another way.<br><br>
+    <b>Which search terms bring leads?</b> Google never tells a website the exact words a person searched. A lead can be tied to the page where the form was filled in, and the keyword table above then shows which searches send people to that page. The next step is to show "leads per page" here as well.`;
 }
 
 function table(){
