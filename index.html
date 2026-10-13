@@ -157,7 +157,7 @@ tr.det{display:none}tr.det.open{display:table-row}
     <div class="seg" role="group" aria-label="Time period">
       <button data-p="28" aria-pressed="true">Last 28 days</button>
       <button data-p="90" aria-pressed="false">Last 3 months</button>
-      <button data-p="all" aria-pressed="false">All of 2026</button>
+      <button data-p="all" aria-pressed="false">Since March</button>
     </div>
     <span class="rng" id="rng"></span>
   </div>
@@ -310,7 +310,7 @@ function short(){
     most ? `<b>Your most searched keyword is "${esc(most.q)}".</b> You were seen ${fmt(most.v)} times for it at position ${most.p}, but only ${fmt(most.c)} people clicked. Moving higher on that search is the biggest single opportunity.` : '',
     `<b>${near} searches are almost on page 1</b> (position 11 to 20), and ${up} searches moved up in the last 28 days. See "Almost on page 1" and "Moving up" in the keyword table.`,
     `<b>${fmt(p28.nnew)} new searches</b> started showing your site in the last 28 days that did not show it in the 28 days before.`,
-    `<b>Almost nobody searches for your name on Google yet</b> (${fmt(brand)} views all year for "Mkay" or "Maria Kamau"). People find you through your guides, not your name. Podcasts, press and YouTube are what build name searches over time.`,
+    `<b>Almost nobody searches for your name on Google yet</b> (${fmt(brand)} views since March for "Mkay" or "Maria Kamau"). People find you through your guides, not your name. Podcasts, press and YouTube are what build name searches over time.`,
     mob && allc ? `<b>${Math.round(mob[1]/allc*100)}% of Google visitors read on a phone</b>, and ${ke ? Math.round(ke[1]/c*100) : 0}% are in Kenya.` : '',
     `<b>Leads:</b> ${fmt(wl)} webinar sign-ups across your last 2 webinars, almost all from WhatsApp and email. None are recorded as coming from Google yet. See the Leads section.`
   ];
@@ -406,7 +406,7 @@ function pagesT(){
 }
 function who(){
   const p = D.periods[P], co = p.countries, max = Math.max(...co.map(x => x[1]), 1);
-  $('#whohint').textContent = `Where your Google visitors are, and what they read on (${P==='all'?'all of 2026':P==='90'?'last 3 months':'last 28 days'}).`;
+  $('#whohint').textContent = `Where your Google visitors are, and what they read on (${P==='all'?'since March':P==='90'?'last 3 months':'last 28 days'}).`;
   $('#countries').innerHTML = co.filter(x => x[1] > 0).slice(0, 8).map(x => `<div class="hbar"><span>${CN[x[0]] || x[0].toUpperCase()}</span><span class="t"><i style="width:${Math.max(2, x[1]/max*100)}%"></i></span><span class="n">${fmt(x[1])}</span></div>`).join('') + '<div class="so">Visitors from Google per country.</div>';
   const tot = p.devices.reduce((s,x) => s + x[1], 0) || 1;
   $('#devices').innerHTML = p.devices.map(x => `<div><span class="so">${DV[x[0]] || x[0]}</span><b>${Math.round(x[1]/tot*100)}%</b><span class="so">${fmt(x[1])} visitors, position ${x[3]}</span></div>`).join('');
