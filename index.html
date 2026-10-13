@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Travel with Mkay Progress</title>
+<link rel="icon" href="https://travelwithmkay.co.ke/wp-content/uploads/2023/05/cropped-TWMK_favicon-32x32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F7F3EE;--card:#fff;--ink:#14213D;--ink2:#4A5468;--muted:#7A8294;--line:#E6DED3;--navy:#001F78;--bar:#2B4BA8;--bar2:#B9C6EA;--accent:#B84E1E;--good:#1E7A4C;--sand:#EAD1B3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1424;--card:#151F35;--ink:#EEF1F7;--ink2:#B7C0D3;--muted:#8A94A8;--line:#26324D;--navy:#9DB4FF;--bar:#7F9CF5;--bar2:#34457A;--accent:#F08A5D;--good:#5CC795;--sand:#3A3022}}
+:root[data-theme="dark"]{--bg:#0D1424;--card:#151F35;--ink:#EEF1F7;--ink2:#B7C0D3;--muted:#8A94A8;--line:#26324D;--navy:#9DB4FF;--bar:#7F9CF5;--bar2:#34457A;--accent:#F08A5D;--good:#5CC795;--sand:#3A3022}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Lato,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2{font-family:"Playfair Display",Georgia,serif;color:var(--navy);margin:0;font-weight:700}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 16px 60px}
+/* lock */
+#lock{min-height:100vh;display:grid;place-items:center;padding:16px}
+.lockbox{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:34px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,31,120,.08)}
+.lockbox img{width:56px;height:56px;border-radius:12px}
+.lockbox h1{font-size:26px;margin:12px 0 4px}
+.lockbox p{color:var(--ink2);margin:0 0 20px;font-size:15px}
+.lockbox input{width:100%;font:inherit;padding:13px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.lockbox input:focus{outline:none;border-color:var(--navy)}
+.lockbox button,.seg button{font:inherit;cursor:pointer}
+.lockbox button{margin-top:12px;width:100%;padding:13px;border:0;border-radius:10px;background:var(--navy);color:#fff;font-weight:700}
+:root[data-theme="dark"] .lockbox button{color:#0D1424}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lockbox button{color:#0D1424}}
+.err{color:#C0392B;font-size:14px;min-height:20px;margin-top:8px}
+#app{display:none}
+/* head */
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.top h1{font-size:clamp(26px,4vw,36px);line-height:1.15}
+.sub{color:var(--ink2);margin-top:6px}
+.badge{font-size:13px;color:var(--muted)}
+.hero{background:var(--navy);color:#fff;border-radius:18px;padding:24px 26px;margin-bottom:18px}
+:root[data-theme="dark"] .hero{background:#1C2B55}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero{background:#1C2B55}}
+.hero .big{font-family:"Playfair Display",serif;font-size:clamp(24px,3.6vw,34px);line-height:1.2}
+.hero .big b{color:#FFC15E}
+.hero p{margin:8px 0 0;color:#D6DDF2}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.kpi .l{font-size:13px;color:var(--ink2)}
+.kpi .v{font-size:28px;font-weight:900;margin:2px 0;font-variant-numeric:tabular-nums}
+.kpi .d{font-size:13px;color:var(--muted)}
+.up{color:var(--good);font-weight:700}.down{color:var(--accent);font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px}
+.card h2{font-size:22px}
+.card .hint{color:var(--muted);font-size:14px;margin:4px 0 14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap;margin-bottom:12px}
+.seg button{border:0;background:none;padding:7px 14px;border-radius:999px;color:var(--ink2);font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#0D1424}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#0D1424}}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font:12px Lato,sans-serif;fill:var(--muted)}
+.chart .val{fill:var(--ink2);font-weight:700}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;padding:8px 10px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-110%);opacity:0;transition:opacity .12s}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--ink2);margin-top:8px;flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px}
+/* table */
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:11px 8px;border-bottom:1px solid var(--line);font-size:15px}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700}
+th:first-child,td:first-child{text-align:left}
+tr.row{cursor:pointer}
+tr.row:hover td{background:var(--bg)}
+tr.row td:first-child::before{content:"▸";display:inline-block;width:16px;color:var(--muted);transition:transform .15s}
+tr.row.open td:first-child::before{transform:rotate(90deg)}
+tr.det td{background:var(--bg);text-align:left;padding:16px}
+tr.det{display:none}tr.det.open{display:table-row}
+.det-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;font-size:14px}
+.det-grid h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 6px}
+.det-grid ol,.det-grid ul{margin:0;padding-left:18px}.det-grid li{margin:3px 0;word-break:break-word}
+.det-grid a{color:var(--navy)}
+.so{font-size:12px;color:var(--muted);font-weight:400}
+.foot{color:var(--muted);font-size:13px}
+.foot dt{font-weight:700;color:var(--ink2);margin-top:8px}.foot dd{margin:0}
+.tablewrap{overflow-x:auto}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}.det-grid{grid-template-columns:1fr}.hide-sm{display:none}th,td{padding:10px 5px;font-size:14px}}
+</style>
+</head>
+<body>
+<div id="lock">
+  <form class="lockbox" id="f">
+    <img src="https://travelwithmkay.co.ke/wp-content/uploads/2023/05/cropped-TWMK_favicon-192x192.png" alt="">
+    <h1>Maria's Progress</h1>
+    <p>Travel with Mkay, month by month</p>
+    <input id="pw" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password" required>
+    <button type="submit" id="go">Open dashboard</button>
+    <div class="err" id="err" role="alert"></div>
+  </form>
+</div>
+
+<div id="app" class="wrap">
+  <div class="top">
+    <div><h1>Your website, month by month</h1><div class="sub">How many people find travelwithmkay.co.ke on Google, and what you published.</div></div>
+    <div class="badge" id="upd"></div>
+  </div>
+  <div class="hero" id="hero"></div>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card">
+    <h2>Monthly progress</h2>
+    <div class="hint" id="chint">Hover or tap a bar for the exact number.</div>
+    <div class="seg" role="group" aria-label="Choose what to show">
+      <button data-k="clicks" aria-pressed="true">Visitors from Google</button>
+      <button data-k="views" aria-pressed="false">Times seen on Google</button>
+      <button data-k="top10" aria-pressed="false">Searches on page 1</button>
+      <button data-k="posts" aria-pressed="false">Articles published</button>
+    </div>
+    <div class="chart" id="chart"><div class="tip" id="tip"></div></div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="card">
+    <h2>Every month in detail</h2>
+    <div class="hint">Tap a month to see the top searches, top pages and the articles published that month.</div>
+    <div class="tablewrap"><table id="tbl"></table></div>
+  </div>
+
+  <div class="card foot">
+    <h2 style="font-size:18px">What the numbers mean</h2>
+    <dl>
+      <dt>Visitors from Google</dt><dd>People who clicked through to your site from a Google search.</dd>
+      <dt>Times seen on Google</dt><dd>How often a page of yours showed up in someone's search results.</dd>
+      <dt>Searches on page 1</dt><dd>Different searches where your site showed in the top 10 results.</dd>
+      <dt>Average position</dt><dd>Where you show up on average in Google. Lower is better (1 = top).</dd>
+      <dt>This month</dt><dd>Google reports with a 2 to 3 day delay, so the current month is "so far". The pale bar shows where the month is heading at today's pace.</dd>
+    </dl>
+    <p>Source: Google Search Console and the blog on travelwithmkay.co.ke.</p>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const store = {get(k){try{return sessionStorage.getItem(k)}catch(e){return null}}, set(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}};
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function decrypt(pw){
+  const e = await (await fetch('data.enc.json', {cache:'no-store'})).json();
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw.trim().toLowerCase()), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey({name:'PBKDF2', salt:b64(e.salt), iterations:e.iter, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['decrypt']);
+  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:b64(e.iv)}, key, b64(e.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function unlock(pw){
+  $('#go').textContent = 'Opening...';
+  try { const d = await decrypt(pw); store.set('mk_pw', pw); $('#lock').style.display='none'; $('#app').style.display='block'; render(d); }
+  catch(x){ $('#err').textContent = 'That password did not work. Please try again.'; $('#go').textContent = 'Open dashboard'; }
+}
+$('#f').addEventListener('submit', e => { e.preventDefault(); unlock($('#pw').value); });
+const saved = store.get('mk_pw'); if (saved) unlock(saved);
+
+const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MF = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const lab = m => MN[+m.m.slice(5)-1] + (m.m.slice(5)==='01' ? ' ' + m.m.slice(0,4) : '');
+const full = m => MF[+m.m.slice(5)-1] + ' ' + m.m.slice(0,4);
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const CN = {ken:'Kenya',usa:'United States',gbr:'United Kingdom',ind:'India',nga:'Nigeria',zaf:'South Africa',uga:'Uganda',tza:'Tanzania',can:'Canada',aus:'Australia',deu:'Germany',nld:'Netherlands',mex:'Mexico',egy:'Egypt',mys:'Malaysia',are:'UAE',gha:'Ghana',rwa:'Rwanda',eth:'Ethiopia',fra:'France'};
+const days = m => (new Date(m.to) - new Date(m.from))/864e5 + 1;
+const monthDays = m => new Date(+m.m.slice(0,4), +m.m.slice(5), 0).getDate();
+const val = (m,k) => k==='posts' ? m.posts.length : m[k];
+const pace = (m,k) => k==='posts' || k==='top10' ? null : m.partial ? val(m,k) / days(m) * monthDays(m) : null;
+const pct = (a,b) => b ? Math.round((a-b)/b*100) : null;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const strip = s => { const t = document.createElement('div'); t.innerHTML = s; return t.textContent; };
+
+let D, K = 'clicks';
+function render(d){
+  D = d;
+  const M = d.months, cur = M[M.length-1], full1 = M.filter(m => !m.partial), last = full1[full1.length-1], prev = full1[full1.length-2];
+  const first = M.find(m => m.clicks >= 5) || M[0];
+  $('#upd').textContent = 'Google data through ' + new Date(d.through).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const mult = first.clicks ? Math.round(last.clicks / first.clicks) : 0;
+  $('#hero').innerHTML = `<div class="big">From <b>${fmt(first.clicks)}</b> visitors from Google in ${MF[+first.m.slice(5)-1]} to <b>${fmt(last.clicks)}</b> in ${MF[+last.m.slice(5)-1]}.</div>
+    <p>That is about ${mult}x more people finding you on Google each month. You were seen ${fmt(last.views)} times in Google search in ${MF[+last.m.slice(5)-1]}.${cur.partial ? ` ${MF[+cur.m.slice(5)-1]} so far: ${fmt(cur.clicks)} visitors in ${days(cur)} days, on pace for about ${fmt(pace(cur,'clicks'))}.` : ''}</p>`;
+  const k = (l, v, a, b, inv, unit='') => { const p = inv ? (b && a ? Math.round((b-a)/b*100) : null) : pct(a,b);
+    return `<div class="kpi"><div class="l">${l}</div><div class="v">${v}${unit}</div><div class="d">${p===null?'':`<span class="${p>=0?'up':'down'}">${p>=0?'▲':'▼'} ${Math.abs(p)}%</span> vs ${MF[+prev.m.slice(5)-1]}`}</div></div>`; };
+  $('#kpis').innerHTML = `<div class="kpi" style="grid-column:1/-1;padding:10px 16px;background:none;border:0"><div class="l"><b>${full(last)}</b> (last full month)</div></div>` +
+    k('Visitors from Google', fmt(last.clicks), last.clicks, prev.clicks) +
+    k('Times seen on Google', fmt(last.views), last.views, prev.views) +
+    k('Searches on page 1', fmt(last.top10), last.top10, prev.top10) +
+    k('Average position', last.pos.toFixed(1), last.pos, prev.pos, true);
+  document.querySelectorAll('.seg button').forEach(b => b.onclick = () => { K = b.dataset.k; document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x===b)); chart(); });
+  chart(); table();
+}
+
+function chart(){
+  const M = D.months, W = 900, H = 300, L = 8, R = 8, T = 24, B = 34;
+  const vals = M.map(m => val(m,K)), paces = M.map(m => pace(m,K));
+  const max = Math.max(...vals, ...paces.filter(p => p!==null), 1) * 1.08;
+  const step = (W-L-R)/M.length, bw = Math.min(54, step*0.62);
+  const y = v => T + (H-T-B) * (1 - v/max);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Monthly bar chart">`;
+  for (let i=1;i<=3;i++){ const yy = T + (H-T-B)*i/4; s += `<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="var(--line)" stroke-dasharray="2 4"/>`; }
+  s += `<line x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}" stroke="var(--line)"/>`;
+  M.forEach((m,i) => {
+    const cx = L + step*i + step/2, x = cx - bw/2, v = vals[i], p = paces[i];
+    if (p !== null && p > v) s += `<path d="${bar(x, y(p), bw, H-B-y(p))}" fill="var(--bar2)" opacity=".75"/>`;
+    s += `<path d="${bar(x, y(v), bw, H-B-y(v))}" fill="var(--bar)"/>`;
+    const showLab = v > 0 && (i === M.length-1 || i === M.length-2 || v === Math.max(...vals));
+    if (showLab) s += `<text class="val" x="${cx}" y="${y(Math.max(v, p||0))-7}" text-anchor="middle">${fmt(v)}</text>`;
+    s += `<text x="${cx}" y="${H-B+20}" text-anchor="middle">${lab(m)}${m.partial?'*':''}</text>`;
+    s += `<rect x="${L+step*i}" y="${T}" width="${step}" height="${H-T-B}" fill="transparent" data-i="${i}"/>`;
+  });
+  s += '</svg>';
+  const c = $('#chart'); c.innerHTML = s + '<div class="tip" id="tip"></div>';
+  const tip = $('#tip'), names = {clicks:'visitors from Google', views:'times seen on Google', top10:'searches on page 1', posts:'articles published'};
+  c.querySelectorAll('rect[data-i]').forEach(r => {
+    const show = () => { const i = +r.dataset.i, m = M[i], cx = (L + step*i + step/2)/W*c.clientWidth;
+      tip.innerHTML = `<b>${full(m)}${m.partial?' (so far)':''}</b><br>${fmt(vals[i])} ${names[K]}` + (paces[i]!==null ? `<br>On pace for ~${fmt(paces[i])}` : '');
+      tip.style.left = Math.min(Math.max(cx, 90), c.clientWidth-90) + 'px'; tip.style.top = (y(Math.max(vals[i], paces[i]||0))/H*c.clientWidth*H/W) + 'px'; tip.style.opacity = 1; };
+    r.addEventListener('mouseenter', show); r.addEventListener('click', show); r.addEventListener('mouseleave', () => tip.style.opacity = 0);
+  });
+  const cur = M[M.length-1];
+  $('#legend').innerHTML = cur.partial ? `<span><i style="background:var(--bar)"></i>${MF[+cur.m.slice(5)-1]} so far*</span>` + (paces[M.length-1]!==null ? `<span><i style="background:var(--bar2)"></i>Where ${MF[+cur.m.slice(5)-1]} is heading at today's pace</span>` : '') : '';
+}
+function bar(x, y0, w, h){ if (h <= 0) return ''; const r = Math.min(4, h, w/2); return `M${x},${y0+h}V${y0+r}Q${x},${y0} ${x+r},${y0}H${x+w-r}Q${x+w},${y0} ${x+w},${y0+r}V${y0+h}Z`; }
+
+function table(){
+  const M = D.months.slice().reverse();
+  let h = `<thead><tr><th>Month</th><th>Visitors</th><th class="hide-sm">Seen on Google</th><th>Page 1 searches</th><th class="hide-sm">Avg position</th><th>Articles</th></tr></thead><tbody>`;
+  M.forEach((m,i) => {
+    const prev = M[i+1]; const ch = prev && !m.partial ? pct(m.clicks, prev.clicks) : null;
+    h += `<tr class="row" data-i="${i}" tabindex="0"><td><b>${full(m)}</b>${m.partial?` <span class="so">so far</span>`:''}</td>
+      <td>${fmt(m.clicks)}${ch!==null && prev.clicks>=5 ? ` <span class="${ch>=0?'up':'down'}" style="font-size:12px">${ch>=0?'+':''}${ch}%</span>`:''}</td>
+      <td class="hide-sm">${fmt(m.views)}</td><td>${fmt(m.top10)}</td><td class="hide-sm">${m.pos ? m.pos.toFixed(1) : '-'}</td><td>${m.posts.length}</td></tr>
+      <tr class="det" id="det${i}"><td colspan="6"><div class="det-grid">
+        <div><h3>Top searches</h3>${m.topq.length ? '<ol>' + m.topq.map(q => `<li>${esc(q[0])} <span class="so">${q[1]} visits, pos ${q[3]}</span></li>`).join('') + '</ol>' : '<span class="so">No data yet</span>'}</div>
+        <div><h3>Top pages</h3>${m.topp.length ? '<ol>' + m.topp.map(p => `<li><a href="${esc(p[0])}" target="_blank" rel="noopener">${esc(decodeURI(p[0]).replace(/^https?:\/\/(www\.)?travelwithmkay\.co\.ke/,'') || '/')}</a> <span class="so">${p[1]} visits</span></li>`).join('') + '</ol>' : '<span class="so">No data yet</span>'}
+          ${m.countries.length ? `<h3 style="margin-top:12px">Top countries</h3><span>${m.countries.filter(c=>c[1]).map(c => `${CN[c[0]]||c[0].toUpperCase()} ${c[1]}`).join(', ')}</span>` : ''}</div>
+        <div><h3>Articles published (${m.posts.length})</h3>${m.posts.length ? '<ul>' + m.posts.map(p => `<li><a href="${esc(p[1])}" target="_blank" rel="noopener">${esc(strip(p[0]))}</a></li>`).join('') + '</ul>' : '<span class="so">None this month</span>'}</div>
+      </div></td></tr>`;
+  });
+  $('#tbl').innerHTML = h + '</tbody>';
+  document.querySelectorAll('tr.row').forEach(r => { const t = () => { r.classList.toggle('open'); $('#det'+r.dataset.i).classList.toggle('open'); };
+    r.onclick = t; r.onkeydown = e => { if (e.key==='Enter' || e.key===' ') { e.preventDefault(); t(); } }; });
+}
+</script>
+</body>
+</html>
