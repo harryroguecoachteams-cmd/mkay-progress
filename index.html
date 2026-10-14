@@ -41,9 +41,15 @@ a{color:var(--navy)}
 nav.toc{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
 nav.toc a{font-size:13px;text-decoration:none;color:var(--ink2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--card)}
 nav.toc a:hover{border-color:var(--navy);color:var(--navy)}
-nav.toc a.todo-pill{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:900;font-size:14px;padding:6px 8px 6px 14px;display:inline-flex;align-items:center;gap:8px;box-shadow:0 3px 12px rgba(184,78,30,.35)}
-nav.toc a.todo-pill:hover{color:var(--bg);filter:brightness(1.08)}
-nav.toc a.todo-pill .n{background:var(--bg);color:var(--accent);border-radius:999px;min-width:22px;height:22px;display:inline-grid;place-items:center;font-size:12px;padding:0 6px}
+.topr{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+a.todo-btn{display:inline-flex;white-space:nowrap;flex-shrink:0;align-items:center;gap:8px;text-decoration:none;background:var(--accent);color:var(--bg);font-weight:900;font-size:15px;padding:8px 8px 8px 16px;border-radius:999px;box-shadow:0 3px 12px rgba(184,78,30,.35)}
+a.todo-btn:hover{filter:brightness(1.08)}
+a.todo-btn .n{background:var(--bg);color:var(--accent);border-radius:999px;min-width:24px;height:24px;display:inline-grid;place-items:center;font-size:13px;padding:0 7px}
+#app.todo-mode a.todo-btn{background:var(--card);color:var(--navy);border:1.5px solid var(--navy);box-shadow:none;padding:8px 16px}
+#app.todo-mode a.todo-btn .n{display:none}
+#app.todo-mode > :not(.top):not(#todo){display:none!important}
+#app:not(.todo-mode) #todo{display:none!important}
+@media (max-width:760px){.topr{flex-direction:row-reverse;justify-content:space-between;align-items:center;width:100%}}
 .card.todo{border:2px solid var(--accent);border-left-width:8px}
 .todo > h2{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .todo .prog{font:700 13px Lato,sans-serif;color:var(--accent);background:var(--soft);border-radius:999px;padding:4px 12px}
@@ -51,7 +57,7 @@ nav.toc a.todo-pill .n{background:var(--bg);color:var(--accent);border-radius:99
 .todo li{counter-increment:td;display:grid;grid-template-columns:34px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
 .todo li:first-child{border-top:0}
 .todo li::before{content:counter(td);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:14px;background:var(--accent);color:var(--bg)}
-.todo li.done::before{content:"¹3";background:var(--good)}
+.todo li.done::before{content:"\2713";background:var(--good)}
 .todo li b{display:block;font-size:16px;color:var(--ink)}
 .todo li.done b{text-decoration:line-through;color:var(--muted)}
 .todo li span{display:block;color:var(--ink2);font-size:14px;margin-top:2px}
@@ -138,10 +144,10 @@ tr.det{display:none}tr.det.open{display:table-row}
 <div id="app" class="wrap">
   <div class="top">
     <div><h1>Maria's SEO Progress</h1><div class="sub">How people find travelwithmkay.co.ke on Google, what they search for, and where your leads come from.</div></div>
-    <div class="badge" id="upd"></div>
+    <div class="topr"><a href="#todo" class="todo-btn" id="todobtn" hidden>Your to-do <span class="n" id="todon"></span></a><div class="badge" id="upd"></div></div>
   </div>
   <nav class="toc" aria-label="Sections">
-    <a href="#todo" class="todo-pill" id="todopill" hidden>Your to-do <span class="n" id="todon"></span></a><a href="#short">In short</a><a href="#monthly">Month by month</a><a href="#ranks">Rankings</a><a href="#keywords">Keywords</a><a href="#pages">Pages</a><a href="#who">Who finds you</a><a href="#leads">Organic leads</a><a href="#detail">Every month</a>
+    <a href="#short">In short</a><a href="#monthly">Month by month</a><a href="#ranks">Rankings</a><a href="#keywords">Keywords</a><a href="#pages">Pages</a><a href="#who">Who finds you</a><a href="#leads">Organic leads</a><a href="#detail">Every month</a>
   </nav>
 
   <div class="card todo" id="todo" hidden><h2>Your to-do list <span class="prog" id="todoprog"></span></h2><div class="hint" id="todointro"></div><ol id="todolist"></ol></div>
@@ -319,7 +325,13 @@ function todo(){
   $('#todon').textContent = open || '✓';
   $('#todointro').textContent = T.intro || '';
   $('#todolist').innerHTML = T.items.map(x => `<li class="${x.done ? 'done' : ''}"><div><b>${esc(x.t)}</b><span>${esc(x.d || '')}</span>${x.done ? '<span class="got">Received, thank you.</span>' : ''}${x.link && !x.done ? `<a class="go" href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.lt || 'Open')} &rarr;</a>` : ''}</div></li>`).join('');
-  $('#todo').hidden = $('#todopill').hidden = false;
+  $('#todo').hidden = $('#todobtn').hidden = false;
+  let was = false;
+  const view = () => { const on = location.hash === '#todo'; $('#app').classList.toggle('todo-mode', on);
+    if (was && !on) { chart(); bands(); } was = on;   // charts drawn while hidden need a redraw at real width
+    $('#todobtn').firstChild.textContent = on ? '\u2190 Back to dashboard' : 'Your to-do ';
+    $('#todobtn').setAttribute('href', on ? '#top' : '#todo'); scrollTo(0, 0); };
+  addEventListener('hashchange', view); view();
 }
 
 function short(){
