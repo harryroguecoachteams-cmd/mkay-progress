@@ -16,6 +16,7 @@
 :root[data-theme="dark"]{--bg:#0D1424;--card:#151F35;--ink:#EEF1F7;--ink2:#B7C0D3;--muted:#8D97AB;--line:#26324D;--navy:#9DB4FF;--bar:#7F9CF5;--bar2:#34457A;--accent:#F08A5D;--good:#5CC795;--soft:#1A2540;
   --b0:#D3DCFF;--b1:#8BA4F2;--b2:#4F67B8;--b3:#2C3A6E}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Lato,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:"Playfair Display",Georgia,serif;color:var(--navy);margin:0;font-weight:700}
 a{color:var(--navy)}
@@ -40,6 +41,23 @@ a{color:var(--navy)}
 nav.toc{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
 nav.toc a{font-size:13px;text-decoration:none;color:var(--ink2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--card)}
 nav.toc a:hover{border-color:var(--navy);color:var(--navy)}
+nav.toc a.todo-pill{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:900;font-size:14px;padding:6px 8px 6px 14px;display:inline-flex;align-items:center;gap:8px;box-shadow:0 3px 12px rgba(184,78,30,.35)}
+nav.toc a.todo-pill:hover{color:var(--bg);filter:brightness(1.08)}
+nav.toc a.todo-pill .n{background:var(--bg);color:var(--accent);border-radius:999px;min-width:22px;height:22px;display:inline-grid;place-items:center;font-size:12px;padding:0 6px}
+.card.todo{border:2px solid var(--accent);border-left-width:8px}
+.todo > h2{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.todo .prog{font:700 13px Lato,sans-serif;color:var(--accent);background:var(--soft);border-radius:999px;padding:4px 12px}
+.todo ol{list-style:none;margin:6px 0 0;padding:0;counter-reset:td}
+.todo li{counter-increment:td;display:grid;grid-template-columns:34px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.todo li:first-child{border-top:0}
+.todo li::before{content:counter(td);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:14px;background:var(--accent);color:var(--bg)}
+.todo li.done::before{content:"¹3";background:var(--good)}
+.todo li b{display:block;font-size:16px;color:var(--ink)}
+.todo li.done b{text-decoration:line-through;color:var(--muted)}
+.todo li span{display:block;color:var(--ink2);font-size:14px;margin-top:2px}
+.todo li .got{color:var(--good);font-weight:700}
+.todo li a.go{display:inline-block;margin-top:8px;font-size:14px;font-weight:700;color:var(--navy);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 14px;background:var(--card)}
+.todo li a.go:hover{border-color:var(--navy)}
 .hero{background:#001F78;color:#fff;border-radius:18px;padding:24px 26px;margin-bottom:18px}
 .hero .big{font-family:"Playfair Display",serif;font-size:clamp(24px,3.6vw,34px);line-height:1.2}
 .hero .big b{color:#FFC15E}
@@ -123,8 +141,10 @@ tr.det{display:none}tr.det.open{display:table-row}
     <div class="badge" id="upd"></div>
   </div>
   <nav class="toc" aria-label="Sections">
-    <a href="#short">In short</a><a href="#monthly">Month by month</a><a href="#ranks">Rankings</a><a href="#keywords">Keywords</a><a href="#pages">Pages</a><a href="#who">Who finds you</a><a href="#leads">Organic leads</a><a href="#detail">Every month</a>
+    <a href="#todo" class="todo-pill" id="todopill" hidden>Your to-do <span class="n" id="todon"></span></a><a href="#short">In short</a><a href="#monthly">Month by month</a><a href="#ranks">Rankings</a><a href="#keywords">Keywords</a><a href="#pages">Pages</a><a href="#who">Who finds you</a><a href="#leads">Organic leads</a><a href="#detail">Every month</a>
   </nav>
+
+  <div class="card todo" id="todo" hidden><h2>Your to-do list <span class="prog" id="todoprog"></span></h2><div class="hint" id="todointro"></div><ol id="todolist"></ol></div>
 
   <div class="hero" id="hero"></div>
   <div class="kpis" id="kpis"></div>
@@ -288,8 +308,18 @@ function render(d){
   $$('#kwseg button').forEach(b => b.onclick = () => { V = b.dataset.v; kwN = 15; $$('#kwseg button').forEach(x => x.setAttribute('aria-pressed', x===b)); keywords(); });
   $('#kwmore').onclick = () => { kwN += 15; keywords(); };
   $('#pgmore').onclick = () => { pgN += 15; pagesT(); };
-  short(); chart(); bands(); periodViews(); leads(); table();
+  todo(); short(); chart(); bands(); periodViews(); leads(); table();
   let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => { chart(); bands(); }, 150); });
+}
+
+function todo(){
+  const T = D.todo; if (!T || !T.items || !T.items.length) return;
+  const open = T.items.filter(x => !x.done).length, n = T.items.length;
+  $('#todoprog').textContent = open ? `${n - open} of ${n} done` : 'All done, thank you!';
+  $('#todon').textContent = open || '✓';
+  $('#todointro').textContent = T.intro || '';
+  $('#todolist').innerHTML = T.items.map(x => `<li class="${x.done ? 'done' : ''}"><div><b>${esc(x.t)}</b><span>${esc(x.d || '')}</span>${x.done ? '<span class="got">Received, thank you.</span>' : ''}${x.link && !x.done ? `<a class="go" href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.lt || 'Open')} &rarr;</a>` : ''}</div></li>`).join('');
+  $('#todo').hidden = $('#todopill').hidden = false;
 }
 
 function short(){
