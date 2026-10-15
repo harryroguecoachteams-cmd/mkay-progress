@@ -54,12 +54,15 @@ a.todo-btn .n{background:var(--bg);color:var(--accent);border-radius:999px;min-w
 .todo > h2{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .todo .prog{font:700 13px Lato,sans-serif;color:var(--accent);background:var(--soft);border-radius:999px;padding:4px 12px}
 .todo ol{list-style:none;margin:6px 0 0;padding:0;counter-reset:td}
-.todo li{counter-increment:td;display:grid;grid-template-columns:34px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.todo .bar{height:8px;background:var(--soft);border-radius:999px;overflow:hidden;margin:12px 0 2px}.todo .bar i{display:block;height:100%;background:var(--good);border-radius:999px}
+.todo li{display:grid;grid-template-columns:30px 1fr auto;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
 .todo li:first-child{border-top:0}
-.todo li::before{content:counter(td);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:14px;background:var(--accent);color:var(--bg)}
-.todo li.done::before{content:"\2713";background:var(--good)}
+.todo li .box{width:26px;height:26px;margin-top:1px;border:2.5px solid var(--accent);border-radius:7px;background:var(--card);display:grid;place-items:center;font-weight:900;font-size:16px;line-height:1;color:var(--card)}
+.todo li.done .box{background:var(--good);border-color:var(--good)}
+.todo li .st{font:700 12px Lato,sans-serif;white-space:nowrap;border-radius:999px;padding:4px 10px;margin-top:2px;background:var(--soft);color:var(--accent)}
+.todo li.done .st{color:var(--good)}
 .todo li b{display:block;font-size:16px;color:var(--ink)}
-.todo li.done b{text-decoration:line-through;color:var(--muted)}
+.todo li.done b{color:var(--muted)}
 .todo li span{display:block;color:var(--ink2);font-size:14px;margin-top:2px}
 .todo li .got{color:var(--good);font-weight:700}
 .todo li a.go{display:inline-block;margin-top:8px;font-size:14px;font-weight:700;color:var(--navy);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 14px;background:var(--card)}
@@ -150,7 +153,7 @@ tr.det{display:none}tr.det.open{display:table-row}
     <a href="#short">In short</a><a href="#monthly">Month by month</a><a href="#ranks">Rankings</a><a href="#keywords">Keywords</a><a href="#pages">Pages</a><a href="#who">Who finds you</a><a href="#leads">Organic leads</a><a href="#detail">Every month</a>
   </nav>
 
-  <div class="card todo" id="todo" hidden><h2>Your to-do list <span class="prog" id="todoprog"></span></h2><div class="hint" id="todointro"></div><ol id="todolist"></ol></div>
+  <div class="card todo" id="todo" hidden><h2>Your to-do list <span class="prog" id="todoprog"></span></h2><div class="hint" id="todointro"></div><div class="bar"><i id="todobar"></i></div><ol id="todolist"></ol></div>
 
   <div class="hero" id="hero"></div>
   <div class="kpis" id="kpis"></div>
@@ -324,7 +327,8 @@ function todo(){
   $('#todoprog').textContent = open ? `${n - open} of ${n} done` : 'All done, thank you!';
   $('#todon').textContent = open || '✓';
   $('#todointro').textContent = T.intro || '';
-  $('#todolist').innerHTML = T.items.map(x => `<li class="${x.done ? 'done' : ''}"><div><b>${esc(x.t)}</b><span>${esc(x.d || '')}</span>${x.done ? '<span class="got">Received, thank you.</span>' : ''}${x.link && !x.done ? `<a class="go" href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.lt || 'Open')} &rarr;</a>` : ''}</div></li>`).join('');
+  $('#todobar').style.width = Math.round((n - open) / n * 100) + '%';
+  $('#todolist').innerHTML = T.items.map((x, i) => `<li class="${x.done ? 'done' : ''}"><div class="box" role="img" aria-label="${x.done ? 'Done' : 'Not done yet'}">${x.done ? '&#10003;' : ''}</div><div><b>${i + 1}. ${esc(x.t)}</b><span>${esc(x.d || '')}</span>${x.done ? '<span class="got">Received, thank you.</span>' : ''}${x.link && !x.done ? `<a class="go" href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.lt || 'Open')} &rarr;</a>` : ''}</div><div class="st">${x.done ? 'Received' + (x.when ? ' ' + esc(x.when) : '') : 'To do'}</div></li>`).join('');
   $('#todo').hidden = $('#todobtn').hidden = false;
   let was = false;
   const view = () => { const on = location.hash === '#todo'; $('#app').classList.toggle('todo-mode', on);
