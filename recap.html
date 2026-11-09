@@ -57,11 +57,17 @@ ol.tl ul li,.areas li,.next li{margin:5px 0;color:var(--ink2)}
 .areas{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 .area{background:var(--soft);border-radius:12px;padding:16px}
 .area h3{font-size:18px;margin-bottom:6px}
+.social{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.soc{background:var(--soft);border-radius:12px;padding:16px}
+.soc .pl{font-weight:900;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.soc .v{font-size:32px;font-weight:900;color:var(--navy);line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}
+.soc .l{font-size:15px;color:var(--ink);margin-top:4px}
+.soc .sm{font-size:13px;color:var(--muted);margin-top:8px}
 .next{border:2px solid var(--accent);border-left-width:8px}
 .next li{color:var(--ink)}
 a.go{display:inline-block;margin-top:14px;font-size:14px;font-weight:700;text-decoration:none;color:var(--bg);background:var(--accent);border-radius:999px;padding:8px 18px}
 .so{font-size:12px;color:var(--muted)}
-@media (max-width:760px){.tiles{grid-template-columns:1fr 1fr}.tile .v{font-size:26px}.areas{grid-template-columns:1fr}ol.tl > li{grid-template-columns:1fr;gap:4px}.card{padding:16px}.hero{padding:24px 18px}.chart text{font-size:24px}}
+@media (max-width:760px){.tiles{grid-template-columns:1fr 1fr}.tile .v{font-size:26px}.areas{grid-template-columns:1fr}.social{grid-template-columns:1fr}ol.tl > li{grid-template-columns:1fr;gap:4px}.card{padding:16px}.hero{padding:24px 18px}.chart text{font-size:24px}}
 @media (max-width:380px){.tiles{grid-template-columns:1fr}}
 </style>
 </head>
