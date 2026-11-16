@@ -131,6 +131,10 @@ tr.det{display:none}tr.det.open{display:table-row}
 .dev{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .dev div{background:var(--soft);border-radius:12px;padding:12px}
 .dev b{display:block;font-size:24px}
+#onsite .two{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+#cstbl td:first-child{word-break:break-word;min-width:120px}
+#onsite .dev{margin-top:4px}
+@media (max-width:760px){#onsite .two{grid-template-columns:1fr}#cstbl{table-layout:fixed}#cstbl th:nth-child(2){width:52px}#cstbl th:nth-child(4){width:88px}#cstbl td:first-child{min-width:0}#cstbl td:last-child{white-space:nowrap}}
 .foot dt{font-weight:700;color:var(--ink2);margin-top:8px}.foot dd{margin:0;color:var(--muted);font-size:14px}
 @media (max-width:760px){th{white-space:normal;font-size:11px}.kpis{grid-template-columns:repeat(2,1fr)}.det-grid,.two{grid-template-columns:1fr}.hide-sm{display:none}th,td{padding:9px 5px;font-size:14px}
   .seg{display:grid;grid-template-columns:1fr 1fr;border-radius:14px;width:100%}.seg button{border-radius:10px}.chart text{font-size:15px}
@@ -154,7 +158,7 @@ tr.det{display:none}tr.det.open{display:table-row}
     <div class="topr"><div class="btns"><a href="recap.html" class="recap-btn">Our year together</a><a href="#todo" class="todo-btn" id="todobtn" hidden>Your to-do <span class="n" id="todon"></span></a></div><div class="badge" id="upd"></div></div>
   </div>
   <nav class="toc" aria-label="Sections">
-    <a href="#short">In short</a><a href="#monthly">Month by month</a><a href="#ranks">Rankings</a><a href="#keywords">Keywords</a><a href="#pages">Pages</a><a href="#who">Who finds you</a><a href="#leads">Organic leads</a><a href="#detail">Every month</a>
+    <a href="#short">In short</a><a href="#monthly">Month by month</a><a href="#ranks">Rankings</a><a href="#keywords">Keywords</a><a href="#pages">Pages</a><a href="#who">Who finds you</a><a href="#onsite" id="onsitenav" hidden>On your site</a><a href="#leads">Organic leads</a><a href="#detail">Every month</a>
   </nav>
 
   <div class="card todo" id="todo" hidden><h2>Your to-do list <span class="prog" id="todoprog"></span></h2><div class="hint" id="todointro"></div><div class="bar"><i id="todobar"></i></div><ol id="todolist"></ol></div>
@@ -229,6 +233,17 @@ tr.det{display:none}tr.det.open{display:table-row}
 
   </section>
 
+  <div class="card" id="onsite" hidden>
+    <h2>What search visitors do on your site</h2>
+    <div class="hint" id="cshint"></div>
+    <div class="kpis" id="cskpis" style="margin-bottom:6px"></div>
+    <div class="two">
+      <div><h3>Search engine they came from</h3><div id="cssrc"></div><h3>What they read on</h3><div class="dev" id="csdev"></div></div>
+      <div><h3>Pages they read most</h3><div class="tablewrap"><table id="cstbl"></table></div><button class="more" id="csmore">Show more</button></div>
+    </div>
+    <div class="note" id="csnote"></div>
+  </div>
+
   <div class="card" id="leads">
     <h2>Organic leads</h2>
     <div class="hint">Organic leads only: free resource sign-ups and contact-us messages from your website forms.</div>
@@ -255,9 +270,10 @@ tr.det{display:none}tr.det.open{display:table-row}
       <dt>Searches on page 1</dt><dd>Different searches where your site showed in the top 10 results.</dd>
       <dt>Moving up</dt><dd>Searches where your position got better compared with the period before.</dd>
       <dt>Almost on page 1</dt><dd>Searches where you sit at position 11 to 20. A small improvement to the page can move these onto page 1, where most clicks happen.</dd>
+      <dt>Visits from search</dt><dd>In "What search visitors do on your site": visits that arrived from any search engine (Google, Bing, Yahoo and others), counted by Microsoft Clarity on your site. Bots and every other kind of visit are left out.</dd>
       <dt>This month</dt><dd>Google reports with a 2 to 3 day delay, so the current month is "so far". The pale bar shows where the month is heading at today's pace.</dd>
     </dl>
-    <p class="so">Sources: Google Search Console, the blog on travelwithmkay.co.ke, and your Brevo email lists (free resource and contact us).</p>
+    <p class="so">Sources: Google Search Console, the blog on travelwithmkay.co.ke, your Brevo email lists (free resource and contact us), and Microsoft Clarity on your site.</p>
   </div>
 </div>
 
@@ -302,7 +318,7 @@ const chg = (a,b,inv) => { if (b===null || b===undefined) return '<span class="s
   return `<span class="${p>0?'up':'down'}">${p>0?'▲':'▼'} ${Math.abs(p)}${inv?'':'%'}</span>`; };
 function bar(x, y0, w, h, r=4){ if (h <= 0) return ''; r = Math.min(r, h, w/2); return `M${x},${y0+h}V${y0+r}Q${x},${y0} ${x+r},${y0}H${x+w-r}Q${x+w},${y0} ${x+w},${y0+r}V${y0+h}Z`; }
 
-let D, K = 'clicks', P = '28', V = 'c', kwN = 15, pgN = 15;
+let D, K = 'clicks', P = '28', V = 'c', kwN = 15, pgN = 15, csN = 8;
 function render(d){
   D = d;
   const M = d.months, cur = M[M.length-1], done = M.filter(m => !m.partial), last = done[done.length-1], prev = done[done.length-2];
@@ -321,7 +337,7 @@ function render(d){
   $$('#kwseg button').forEach(b => b.onclick = () => { V = b.dataset.v; kwN = 15; $$('#kwseg button').forEach(x => x.setAttribute('aria-pressed', x===b)); keywords(); });
   $('#kwmore').onclick = () => { kwN += 15; keywords(); };
   $('#pgmore').onclick = () => { pgN += 15; pagesT(); };
-  todo(); short(); chart(); bands(); periodViews(); leads(); table();
+  todo(); short(); chart(); bands(); periodViews(); onsite(); leads(); table();
   let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => { chart(); bands(); }, 150); });
 }
 
@@ -462,6 +478,27 @@ function who(){
   $('#devices').innerHTML = p.devices.map(x => `<div><span class="so">${DV[x[0]] || x[0]}</span><b>${Math.round(x[1]/tot*100)}%</b><span class="so">${fmt(x[1])} visitors, position ${x[3]}</span></div>`).join('');
   const mob = p.devices.find(x => x[0]==='MOBILE');
   $('#devnote').innerHTML = mob ? `Most of your readers are on a phone, so how your pages look and load on a phone matters most.` : '';
+}
+
+function onsite(){
+  const C = D.clarity; if (!C || !C.visits) return;
+  $('#onsite').hidden = $('#onsitenav').hidden = false;
+  const day = s => fdate(s.slice(0, 10)), tot = C.visits;
+  const secs = v => v === null || v === undefined ? 'n/a' : v >= 60 ? `${Math.floor(v / 60)} min ${Math.round(v % 60)} s` : `${Math.round(v)} s`;
+  const share = v => Math.round(v / tot * 100) + '%';
+  $('#cshint').textContent = `From Microsoft Clarity, a tool on your site that shows how people use your pages. Organic only: people who arrived from a search engine such as Google or Bing. Every other kind of visit and all bots are left out. ${day(C.from)} to ${day(C.to)}.`;
+  const k = (l, v, d) => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="d">${d}</div></div>`;
+  $('#cskpis').innerHTML = k('Visits from search', fmt(tot), 'from all search engines') + k('Time actively reading', secs(C.active), 'per visit, on average') +
+    k('How far they scroll', C.scroll === null ? 'n/a' : Math.round(C.scroll) + '%', 'of the page, on average') + k('Pages per visit', C.pps === null ? 'n/a' : C.pps.toFixed(2), 'pages opened before leaving');
+  const max = Math.max(...C.source.map(x => x[1]), 1);
+  $('#cssrc').innerHTML = C.source.map(x => `<div class="hbar"><span>${esc(x[0])}</span><span class="t"><i style="width:${Math.max(2, x[1] / max * 100)}%"></i></span><span class="n">${fmt(x[1])}</span></div>`).join('') + '<div class="so">Visits per search engine.</div>';
+  $('#csdev').innerHTML = C.device.map(x => `<div><span class="so">${esc(x[0])}</span><b>${share(x[1])}</b><span class="so">${fmt(x[1])} visits</span></div>`).join('');
+  const rows = () => { $('#cstbl').innerHTML = `<thead><tr><th>Page</th><th>Visits</th><th class="hide-sm">Scrolled</th><th>Reading time</th></tr></thead><tbody>` +
+      C.pages.slice(0, csN).map(g => `<tr><td class="l"><a href="https://travelwithmkay.co.ke${esc(encodeURI(g[0]))}" target="_blank" rel="noopener">${esc(g[0])}</a></td><td>${fmt(g[1])}</td><td class="hide-sm">${g[2] === null ? 'n/a' : g[2] + '%'}</td><td>${secs(g[3])}</td></tr>`).join('') + '</tbody>';
+    $('#csmore').style.display = C.pages.length > csN ? '' : 'none'; };
+  $('#csmore').onclick = () => { csN += 10; rows(); }; rows();
+  $('#csnote').innerHTML = `<b>Why this starts on ${day(C.from)}.</b> Clarity only keeps the last 3 days ready to download, so the numbers are now saved every day and this section grows from here. Earlier dates cannot be added.<br><br>
+    <b>Why this does not match the Google numbers above.</b> These visits include Bing, Yahoo and other search engines as well as Google, and Clarity counts in its own way. A visit also counts on every page it opened, so the page list can add up to a little more than the total.`;
 }
 
 function leads(){
